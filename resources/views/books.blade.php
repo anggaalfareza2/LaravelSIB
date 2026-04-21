@@ -10,13 +10,13 @@
     <h1>Hello World</h1>
     <p>Selamat Datang Di Toko Book Sales</p>
 
-    @foreach ($books as $item)
-    <ul>
-        <li>{{$item['title']}}</li>
-        <li>{{$item['description']}}</li>
-        <li>{{$item['price']}}</li>
-        <li>{{$item['stock']}}</li>
-    </ul>
+     @foreach ($books as $book)
+        <ul>
+            <li>{{ $book['title'] }}</li>
+            <li>{{ $book['description'] }}</li>
+            <li>Rp {{ number_format($book['price'], 0, ',', '.') }}</li>
+            <li>Stok: {{ $book['stok'] }}</li>
+        </ul>
     @endforeach
 </body>
 </html>
