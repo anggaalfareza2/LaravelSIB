@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,9 +18,15 @@ Route::apiResource('/books', BookController::class)->only(['index', 'show']);
 Route::apiResource('/genres', GenreController::class)->only(['index', 'show']);
 Route::apiResource('/authors', AuthorController::class)->only(['index', 'show']);
 
+//customer routes - bisa di akses dengan login
+Route::middleware(['auth:api'])->group(function() {
+    Route::apiResource('/transactions', TransactionController::class)->only(['index', 'store', 'show']);
+});
+
 // Admin only routes — harus login + role admin
 Route::middleware(['auth:api', 'role:admin'])->group(function () {
     Route::apiResource('/books', BookController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('/genres', GenreController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('/authors', AuthorController::class)->only(['store', 'update', 'destroy']);
+    Route::apiResource('/transactions', TransactionController::class)->only(['update', 'destroy']);
 });
