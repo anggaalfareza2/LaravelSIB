@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
+class CheckRole
+{
+    public function handle(Request $request, Closure $next, ...$roles): Response
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            if (!in_array($user->role, $roles)) {
+                return response()->json([
+                    'succes'  => false,
+                    'message' => 'Unauthorized'
+                ], 403);
+            }
+
+            return $next($request);
+
+        } catch (JWTException $e) {
+            return response()->json([
+                'succes'  => false,
+                'message' => 'token is invalid/expired'
+            ], 401);
+        }
+    }
+}
