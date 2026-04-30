@@ -12,21 +12,17 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
+// Public routes — tanpa auth
+Route::apiResource('/books', BookController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+Route::apiResource('/genres', GenreController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+Route::apiResource('/authors', AuthorController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
-// Public routes — bisa diakses semua orang tanpa login
-Route::apiResource('/books', BookController::class)->only(['index', 'show']);
-Route::apiResource('/genres', GenreController::class)->only(['index', 'show']);
-Route::apiResource('/authors', AuthorController::class)->only(['index', 'show']);
-
-//customer routes - bisa di akses dengan login
-Route::middleware(['auth:api'])->group(function() {
-    Route::apiResource('/transactions', TransactionController::class)->only(['index', 'store', 'show']);
+// Customer routes
+Route::middleware(['auth:api', 'checkRole:customer'])->group(function () {
+    Route::apiResource('/transactions', TransactionController::class)->only(['store', 'show', 'update']);
 });
 
-// Admin only routes — harus login + role admin
-Route::middleware(['auth:api', 'role:admin'])->group(function () {
-    Route::apiResource('/books', BookController::class)->only(['store', 'update', 'destroy']);
-    Route::apiResource('/genres', GenreController::class)->only(['store', 'update', 'destroy']);
-    Route::apiResource('/authors', AuthorController::class)->only(['store', 'update', 'destroy']);
-    Route::apiResource('/transactions', TransactionController::class)->only(['update', 'destroy']);
+// Admin only routes
+Route::middleware(['auth:api', 'checkRole:admin'])->group(function () {
+    Route::apiResource('/transactions', TransactionController::class)->only(['index', 'destroy']);
 });
